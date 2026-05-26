@@ -1,28 +1,32 @@
 #include <LiquidCrystal.h>
 
-// LCD
+// ===== LCD =====
 LiquidCrystal lcd(12, 11, 5, 4, 3, 6);
 
-// Sensores
+// ===== SENSORES =====
 int temperaturaPin = A0;
 int luzPin = A1;
 int vibracaoPin = 2;
 
-// LEDs
+// ===== LEDS =====
 int verde = 8;
 int amarelo = 9;
 int vermelho = 10;
 
 void setup() {
 
+  // Vibração
   pinMode(vibracaoPin, INPUT);
 
+  // LEDs
   pinMode(verde, OUTPUT);
   pinMode(amarelo, OUTPUT);
   pinMode(vermelho, OUTPUT);
 
+  // LCD
   lcd.begin(16,2);
 
+  // Monitor Serial
   Serial.begin(9600);
 }
 
@@ -40,7 +44,7 @@ void loop() {
 
   int luz = analogRead(luzPin);
 
-  // ===== VIBRACAO =====
+  // ===== VIBRAÇÃO =====
 
   int vibracao = digitalRead(vibracaoPin);
 
@@ -56,9 +60,24 @@ void loop() {
   lcd.print("Luz:");
   lcd.print(luz);
 
-  // ===== LEDS =====
+  // ===== LEDS TEMPERATURA =====
 
-  if (temperatura < 30) {
+  // MUITO FRIO
+  if (temperatura < 10) {
+
+    digitalWrite(verde, LOW);
+    digitalWrite(amarelo, LOW);
+    digitalWrite(vermelho, HIGH);
+
+    lcd.clear();
+
+    lcd.setCursor(0,0);
+    lcd.print("TEMP BAIXA");
+
+  }
+
+  // NORMAL
+  else if (temperatura < 30) {
 
     digitalWrite(verde, HIGH);
     digitalWrite(amarelo, LOW);
@@ -66,6 +85,7 @@ void loop() {
 
   }
 
+  // ALERTA
   else if (temperatura < 40) {
 
     digitalWrite(verde, LOW);
@@ -74,15 +94,21 @@ void loop() {
 
   }
 
+  // CRÍTICO
   else {
 
     digitalWrite(verde, LOW);
     digitalWrite(amarelo, LOW);
     digitalWrite(vermelho, HIGH);
 
+    lcd.clear();
+
+    lcd.setCursor(0,0);
+    lcd.print("ALERTA TEMP");
+
   }
 
-  // ===== VIBRACAO =====
+  // ===== VIBRAÇÃO =====
 
   if (vibracao == HIGH) {
 
@@ -94,6 +120,17 @@ void loop() {
     lcd.print("VIBRACAO!");
 
   }
+
+  // ===== SERIAL =====
+
+  Serial.print("Temperatura: ");
+  Serial.println(temperatura);
+
+  Serial.print("Luminosidade: ");
+  Serial.println(luz);
+
+  Serial.print("Vibracao: ");
+  Serial.println(vibracao);
 
   delay(1000);
 }
